@@ -1,12 +1,12 @@
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public abstract class Casa {
     private int num_casa;
     private char siglas[] = { ' ', ' ', ' ', ' ', ' ', ' ' };
-    private Scanner scanner = new Scanner(System.in);
 
     public abstract void aplicarRegra(Jogador jog, ArrayList<Jogador> jogs);
+
+    public abstract String getMsg(Jogador jog);
 
     public void setNumCasa(int num_casa) {
         this.num_casa = num_casa;

@@ -171,6 +171,7 @@ public class Tabuleiro {
     // Método para iniciar as rodadas do jogo
     public void iniciarRodadas() {
         int dados[] = new int[2], indice_jog = 0; // Inicializa variáveis para os dados e o índice do jogador
+        String msg = " ";
         Jogador jog = jogs.get(indice_jog); // Seleciona o primeiro jogador
 
         scanner.nextLine();
@@ -179,17 +180,35 @@ public class Tabuleiro {
         imprimirTabuleiro();
         imprimirInfoJogs();
 
-        System.out.print("\nDigite qualquer tecla: ");
+        System.out.print("\nDigite ENTER para girar os dados: ");
         scanner.nextLine(); // Aguarda o jogador pressionar uma tecla
 
         // Loop principal do jogo
         while (true) {
             limparTerminal(); // Limpa o terminal
+            jog.setMinhaVez(true);
             System.out.println();
+
+            if (jog.getVezBloqueada()) {
+                jog.setVezBloqueada(false);
+                jog = atualizarJogador(jog, indice_jog);
+
+                System.out.printf("\nValor dos dados: [0][0]\nMensagem: %s\n\n", msg);
+                imprimirTabuleiro();
+                imprimirInfoJogs();
+
+                msg = " ";
+
+                System.out.print("\nDigite ENTER para girar os dados: ");
+                scanner.nextLine(); // Aguarda o jogador pressionar uma tecla
+                continue;
+            }
 
             casas.get(jog.getCasaAtual()).setSigla(' ', jog.getNumJogador());
             dados = jog.girarDados(); // Gira os dados
             jog.andarCasas(dados[0] + dados[1]); // Move o jogador pelo tabuleiro
+
+            System.out.printf("\nValor dos dados: [%d][%d]\nMensagem: %s\n\n", dados[0], dados[1], msg);
 
             if (jog.getCasaAtual() == 40)
                 break;
@@ -198,14 +217,17 @@ public class Tabuleiro {
                                                                                          // atual
 
             casas.get(jog.getCasaAtual()).aplicarRegra(jog, jogs);
+            msg = casas.get(jog.getCasaAtual()).getMsg(jog);
             imprimirTabuleiro();
             imprimirInfoJogs();
 
-            // Passa a vez para o próximo jogador
-            indice_jog = (indice_jog + 1) % jogs.size();
-            jog = jogs.get(indice_jog);
+            if (!(jog.getJogarNovamente() || dados[0] == dados[1]))
+                jog = atualizarJogador(jog, indice_jog);
 
-            System.out.print("\nDigite qualquer tecla: ");
+            if (jog.getJogarNovamente())
+                jog.setJogarNovamente(false);
+
+            System.out.print("\nDigite ENTER para girar os dados: ");
             scanner.nextLine(); // Aguarda o jogador pressionar uma tecla
         }
     }
@@ -225,5 +247,13 @@ public class Tabuleiro {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace(); // Trata exceções de I/O ou interrupção
         }
+    }
+
+    private Jogador atualizarJogador(Jogador jog, int indice_jog) {
+        jog.setMinhaVez(false);
+        indice_jog = (indice_jog + 1) % jogs.size();
+        jog = jogs.get(indice_jog);
+
+        return jog;
     }
 }
