@@ -1,259 +1,247 @@
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Tabuleiro {
-    private int indice_casa, tipo_casa; // Variáveis para armazenar o índice da casa e o tipo de casa selecionados
-    private ArrayList<Jogador> jogs; // Lista de jogadores
-    private ArrayList<Casa> casas; // Lista de casas no tabuleiro
-    private Scanner scanner; // Scanner para entrada de dados
+    // A única instância da classe Tabuleiro (Singleton)
+    private static Tabuleiro instancia;
 
-    // Construtor da classe, inicializa jogadores e casas
-    public Tabuleiro(ArrayList<String> nomes, ArrayList<String> cores, ArrayList<Integer> tipos, Scanner scanner) {
-        this.scanner = scanner;
-        this.jogs = definirJogadores(nomes, cores, tipos); // Define os jogadores com base nos nomes, cores e tipos
-        this.casas = definirCasas(); // Define as casas do tabuleiro
+    // Scanner para capturar entrada do usuário
+    private Scanner scanner = new Scanner(System.in);
+
+    // Fábrica para criar jogadores e casas
+    private Factory factory = new Factory();
+
+    // Lista de jogadores
+    private ArrayList<Jogador> jogs = new ArrayList<Jogador>();
+
+    // Lista de casas
+    private ArrayList<Casa> casas = new ArrayList<Casa>();
+
+    // Construtor privado para evitar que outras classes criem uma nova instância
+    private Tabuleiro() {
     }
 
-    // Método para definir os jogadores com base nos nomes, cores e tipos recebidos
-    private ArrayList<Jogador> definirJogadores(ArrayList<String> nomes, ArrayList<String> cores,
-            ArrayList<Integer> tipos) {
-        ArrayList<Jogador> jogs = new ArrayList<Jogador>(); // Cria lista de jogadores
-
-        // Laço para adicionar jogadores conforme o tipo (normal, sortudo ou azarado)
-        for (int i = 0; i < nomes.size(); i++) {
-            if (tipos.get(i) == 0)
-                jogs.add(new JogadorNormal(nomes.get(i), cores.get(i), i, 0)); // Jogador normal
-            else if (tipos.get(i) == 1)
-                jogs.add(new JogadorSortudo(nomes.get(i), cores.get(i), i, 1)); // Jogador sortudo
-            else
-                jogs.add(new JogadorAzarado(nomes.get(i), cores.get(i), i, 2)); // Jogador azarado
+    // Método estático que retorna a única instância da classe (implementando o
+    // padrão Singleton)
+    public static Tabuleiro instanciar() {
+        if (instancia == null) {
+            // Se a instância ainda não foi criada, ela é instanciada
+            instancia = new Tabuleiro();
         }
-
-        return jogs;
+        return instancia;
     }
 
-    // Método para capturar o número de casas especiais do usuário, com validação
-    private int digitarNumCasasEspeciais() {
-        int num_casas_especiais = 0;
+    // Verifica se o tipo de casa informado é válido
+    private boolean tipoCasaValido(String tipo_casa) {
+        boolean tipo_valido = false;
 
-        while (true) {
-            try {
-                System.out.print("\nInsira o numero de casas especiais: ");
-                num_casas_especiais = scanner.nextInt();
+        // Array com os tipos de casas válidos
+        String tipos_casas[] = { "AZAR", "JOGAR DE NOVO", "PRISAO", "REVERSA", "SORTE", "SURPRESA", "TROCA" };
 
-                // Valida se o número está dentro do limite aceitável
-                if (num_casas_especiais < 0 || num_casas_especiais > 39)
-                    throw new AcaoInvalidaException(); // Lança exceção caso exceda o limite
-
+        // Verifica se o tipo de casa informado existe no array de tipos válidos
+        for (int i = 0; i < 7; i++) {
+            if (tipo_casa.equals(tipos_casas[i])) {
+                tipo_valido = true;
                 break;
-            } catch (AcaoInvalidaException e) {
-                e.excedeLimiteCasas(); // Exibe mensagem de erro para limite excedido
             }
         }
 
-        return num_casas_especiais;
+        return tipo_valido;
     }
 
-    // Método para o usuário escolher o índice e o tipo da casa especial
-    private void escolherIndiceCasa(ArrayList<Casa> casas) {
+    // Método para ajustar as casas especiais do tabuleiro
+    private void ajustarCasasEspeciais(int qtd_casas_especiais, int qtd_casas) {
+        int i = 0, pos = 0;
+        String tipo_casa;
+        String tipos_casas[] = { "AZAR", "JOGAR DE NOVO", "PRISAO", "REVERSA", "SORTE", "SURPRESA", "TROCA" };
 
+        // Adiciona as casas especiais no tabuleiro, até alcançar a quantidade definida
+        while (i < qtd_casas_especiais) {
+            System.out.println();
+
+            for (int j = 0; j < 7; j++)
+                System.out.printf("%d.%s ", j + 1, tipos_casas[j]);
+
+            try {
+                // Pergunta o tipo e a posição de cada casa especial
+                System.out.printf("\n\nColoque o tipo da %d* casa: ", i + 1);
+                scanner.nextLine();
+                tipo_casa = scanner.nextLine().trim().toUpperCase();
+                System.out.printf("Coloque a posicao da dela: ");
+                pos = scanner.nextInt();
+
+                // Se o tipo de casa ou a posição forem inválidos, lança uma exceção
+                if (!tipoCasaValido(tipo_casa) || pos < 0 || pos >= qtd_casas)
+                    throw new AcaoInvalidaException();
+
+                // Ajusta a casa especial na posição indicada
+                casas.set(pos, factory.ajustarCasa(tipo_casa));
+                ++i;
+            } catch (AcaoInvalidaException e) {
+                // Trata exceções para posições e tipos de casas inválidos
+                if (pos < 0 || pos >= qtd_casas)
+                    e.excedeLimiteCasas();
+                else
+                    e.tipoCasaInvalido();
+            }
+        }
+    }
+
+    // Método para ajustar todas as casas do tabuleiro
+    public void ajustarCasas(int qtd_casas) {
+        int qtd_casas_especiais;
+
+        // Preenche o array de casas com valores nulos
+        for (int i = 0; i < qtd_casas; i++)
+            casas.add(null);
+
+        // Define o número de casas especiais e ajusta as casas do tabuleiro
         while (true) {
             try {
-                System.out.print("\nSelecione o indice da casa especial: ");
-                indice_casa = scanner.nextInt() - 1; // Recebe o índice da casa
-                System.out.print("Selecione o indice do tipo de casa: ");
-                tipo_casa = scanner.nextInt() - 1; // Recebe o tipo de casa
+                System.out.print("\nInsira o numero de casas especiais: ");
+                qtd_casas_especiais = scanner.nextInt();
 
-                // Validações de limites para o índice e o tipo da casa
-                if (indice_casa < 0 || indice_casa > 39 || tipo_casa < 0 || tipo_casa > 6
-                        || casas.get(indice_casa) != null) {
-                    throw new AcaoInvalidaException(); // Lança exceção caso o valor seja inválido
+                // Se o número de casas especiais for inválido, lança uma exceção
+                if (qtd_casas_especiais < 0 || qtd_casas_especiais > qtd_casas)
+                    throw new AcaoInvalidaException();
+
+                // Ajusta as casas especiais no tabuleiro
+                ajustarCasasEspeciais(qtd_casas_especiais, qtd_casas);
+
+                // Preenche as casas restantes com casas simples
+                for (int i = 0; i < casas.size(); i++) {
+                    if (casas.get(i) == null)
+                        casas.set(i, factory.ajustarCasa("SIMPLES"));
                 }
 
                 break;
             } catch (AcaoInvalidaException e) {
-                // Verifica o tipo de erro e exibe a mensagem correspondente
-                if (indice_casa < 0 || indice_casa > 39)
-                    e.excedeLimiteCasas();
-                else if (tipo_casa < 0 || tipo_casa > 6)
-                    e.tipoCasaInvalido();
-                else
-                    e.casaJaSelecionada(); // Casa já foi selecionada anteriormente
+                // Trata exceção se o número de casas especiais for inválido
+                e.excedeLimiteCasas();
+            }
+        }
+
+    }
+
+    // Método para ajustar os jogadores no tabuleiro
+    public void ajustarJogadores(int qtd_jogs) {
+        int tipo1, tipo2, tipo3;
+
+        // Preenche o array de jogadores com valores nulos
+        for (int i = 0; i < qtd_jogs; i++)
+            jogs.add(null);
+
+        // Ajusta os tipos de jogadores até que não existam jogadores do mesmo tipo
+        while (true) {
+            tipo1 = 0;
+            tipo2 = 0;
+            tipo3 = 0;
+
+            try {
+                ajustarTipoJogadores(qtd_jogs);
+
+                // Conta quantos jogadores de cada tipo existem
+                for (Jogador jog : jogs) {
+                    if (jog instanceof JogadorNormal)
+                        ++tipo1;
+                    else if (jog instanceof JogadorSortudo)
+                        ++tipo2;
+                    else
+                        ++tipo3;
+                }
+
+                // Se todos os jogadores forem do mesmo tipo, lança uma exceção
+                if (tipo1 == qtd_jogs || tipo2 == qtd_jogs || tipo3 == qtd_jogs)
+                    throw new AcaoInvalidaException();
+
+                break;
+            } catch (AcaoInvalidaException e) {
+                // Trata exceção para tipos de jogadores iguais
+                e.tiposIguais();
             }
         }
     }
 
-    // Método para criar a casa especial com base no tipo escolhido
-    private void criarCasa(ArrayList<Casa> casas) {
-        switch (tipo_casa) {
-            case 0:
-                casas.set(indice_casa, new CasaAzar()); // Cria CasaAzar
-                break;
-            case 1:
-                casas.set(indice_casa, new CasaJogarDeNovo()); // Cria CasaJogarDeNovo
-                break;
-            case 2:
-                casas.set(indice_casa, new CasaPrisao()); // Cria CasaPrisao
-                break;
-            case 3:
-                casas.set(indice_casa, new CasaReversa()); // Cria CasaReversa
-                break;
-            case 4:
-                casas.set(indice_casa, new CasaSorte()); // Cria CasaSorte
-                break;
-            case 5:
-                casas.set(indice_casa, new CasaSurpresa()); // Cria CasaSurpresa
-                break;
-            default:
-                casas.set(indice_casa, new CasaTroca()); // Cria CasaTroca para o valor padrão
-                break;
-        }
-    }
+    // Verifica se o tipo de jogador é válido
+    private boolean tipoJogValido(String tipo_jog) {
+        boolean tipo_valido = false;
 
-    // Método para definir todas as casas do tabuleiro
-    private ArrayList<Casa> definirCasas() {
-        int num_casas_especiais = digitarNumCasasEspeciais(); // Recebe o número de casas especiais
-        String tipo_casas[] = { "Azar", "Jogar de Novo", "Prisao", "Reversa", "Sorte", "Surpresa", "Troca" };
+        // Array com os tipos de jogadores válidos
+        String tipos_jogs[] = { "NORMAL", "SORTUDO", "AZARADO" };
 
-        casas = new ArrayList<Casa>(0); // Inicializa lista com 40 casas
-        System.out.println();
-
-        for (int i = 0; i < 40; i++)
-            casas.add(null);
-
-        // Exibe os tipos de casas especiais para o usuário escolher
-        for (int i = 0; i < 7; i++)
-            System.out.printf("%d.%s ", i + 1, tipo_casas[i]);
-
-        // Laço para permitir a escolha das casas especiais pelo usuário
-        for (int i = 0; i < num_casas_especiais; i++) {
-            escolherIndiceCasa(casas); // Escolhe o índice e tipo da casa
-            criarCasa(casas); // Cria a casa especial
+        // Verifica se o tipo de jogador informado existe no array de tipos válidos
+        for (int i = 0; i < 3; i++) {
+            if (tipo_jog.equals(tipos_jogs[i])) {
+                tipo_valido = true;
+                break;
+            }
         }
 
-        // Preenche as casas restantes com CasaSimples
-        for (int i = 0; i < 40; i++) {
-            if (casas.get(i) == null)
-                casas.set(i, new CasaSimples());
+        return tipo_valido;
+    }
+
+    // Verifica se a cor do jogador é válida
+    private boolean corValida(String cor, ArrayList<String> cores) {
+        boolean cor_valida = false;
+
+        // Verifica se a cor está disponível e a remove da lista se for usada
+        for (int i = 0; i < cores.size(); i++) {
+            if (cor.equals(cores.get(i))) {
+                cor_valida = true;
+                cores.remove(i);
+                break;
+            }
         }
-
-        return casas;
+        return cor_valida;
     }
 
-    private void iniciarPrimeiraRodada() {
-        Casa casa = casas.get(0);
+    // Método para ajustar os tipos de jogadores
+    private void ajustarTipoJogadores(int qtd_jogs) {
+        int i = 0;
+        String tipo_jog = null, nome, cor;
+        ArrayList<String> cores = new ArrayList<String>();
 
-        System.out.println("\n");
+        // Lista de cores disponíveis para os jogadores
+        cores.add("AZUL");
+        cores.add("VERMELHO");
+        cores.add("PRETO");
+        cores.add("BRANCO");
+        cores.add("LARANJA");
+        cores.add("ROXO");
 
-        for (Jogador jog : jogs)
-            casa.setSigla(jog.getSigla(), jog.getNumJogador());
+        scanner.nextLine(); // Consome a nova linha
 
-    }
-
-    private void imprimirTabuleiro() {
-        for (int i = 0; i < 40; i++) {
-            casas.get(i).imprimirCasa();
-
-            if ((i + 1) % 8 == 0)
-                System.out.println(); // Quebra de linha a cada 8 casas
-        }
-
-    }
-
-    private void imprimirInfoJogs() {
-        System.out.println();
-
-        for (Jogador jog : jogs)
-            jog.imprimirInfomacoes();
-    }
-
-    // Método para iniciar as rodadas do jogo
-    public void iniciarRodadas() {
-        int dados[] = new int[2], indice_jog = 0; // Inicializa variáveis para os dados e o índice do jogador
-        String msg = " ";
-        Jogador jog = jogs.get(indice_jog); // Seleciona o primeiro jogador
-
-        scanner.nextLine();
-
-        iniciarPrimeiraRodada();
-        imprimirTabuleiro();
-        imprimirInfoJogs();
-
-        System.out.print("\nDigite ENTER para girar os dados: ");
-        scanner.nextLine(); // Aguarda o jogador pressionar uma tecla
-
-        // Loop principal do jogo
-        while (true) {
-            limparTerminal(); // Limpa o terminal
-            jog.setMinhaVez(true);
+        // Ajusta os jogadores até que todos os tipos e cores sejam válidos
+        while (i < qtd_jogs) {
             System.out.println();
 
-            if (jog.getVezBloqueada()) {
-                jog.setVezBloqueada(false);
-                jog = atualizarJogador(jog, indice_jog);
+            try {
+                // Mostra as cores disponíveis para escolha
+                for (int j = 0; j < cores.size(); j++)
+                    System.out.printf("%d.%s ", j + 1, cores.get(j));
 
-                System.out.printf("\nValor dos dados: [0][0]\nMensagem: %s\n\n", msg);
-                imprimirTabuleiro();
-                imprimirInfoJogs();
+                // Pergunta o nome, tipo e cor do jogador
+                System.out.printf("\n\nColoque o nome do %d* jogador: ", i + 1);
+                nome = scanner.nextLine().trim().toUpperCase();
+                System.out.print("Escolha o tipo (normal, sortudo ou azarado): ");
+                tipo_jog = scanner.nextLine().trim().toUpperCase();
+                System.out.print("Escolha a cor: ");
+                cor = scanner.nextLine().trim().toUpperCase();
 
-                msg = " ";
+                // Verifica se o tipo e a cor são válidos, senão lança uma exceção
+                if (!tipoJogValido(tipo_jog) || !corValida(cor, cores))
+                    throw new AcaoInvalidaException();
 
-                System.out.print("\nDigite ENTER para girar os dados: ");
-                scanner.nextLine(); // Aguarda o jogador pressionar uma tecla
-                continue;
+                // Ajusta o jogador com o tipo, nome, cor e posição
+                jogs.set(i, factory.ajustarJogador(nome, cor, i, tipo_jog));
+                ++i;
+            } catch (AcaoInvalidaException e) {
+                // Trata exceção para tipos ou cores inválidos
+                if (!tipoJogValido(tipo_jog))
+                    e.tipoNaoExistente();
+                else
+                    e.CorInexistente();
             }
-
-            casas.get(jog.getCasaAtual()).setSigla(' ', jog.getNumJogador());
-            dados = jog.girarDados(); // Gira os dados
-            jog.andarCasas(dados[0] + dados[1]); // Move o jogador pelo tabuleiro
-
-            System.out.printf("\nValor dos dados: [%d][%d]\nMensagem: %s\n\n", dados[0], dados[1], msg);
-
-            if (jog.getCasaAtual() == 40)
-                break;
-
-            casas.get(jog.getCasaAtual()).setSigla(jog.getSigla(), jog.getNumJogador()); // Atualiza a sigla da casa
-                                                                                         // atual
-
-            casas.get(jog.getCasaAtual()).aplicarRegra(jog, jogs);
-            msg = casas.get(jog.getCasaAtual()).getMsg(jog);
-            imprimirTabuleiro();
-            imprimirInfoJogs();
-
-            if (!(jog.getJogarNovamente() || dados[0] == dados[1]))
-                jog = atualizarJogador(jog, indice_jog);
-
-            if (jog.getJogarNovamente())
-                jog.setJogarNovamente(false);
-
-            System.out.print("\nDigite ENTER para girar os dados: ");
-            scanner.nextLine(); // Aguarda o jogador pressionar uma tecla
         }
-    }
-
-    // Método para limpar o terminal em diferentes sistemas operacionais
-    private static void limparTerminal() {
-        String os = System.getProperty("os.name").toLowerCase(); // Verifica o sistema operacional
-
-        try {
-            if (os.contains("windows")) {
-                // Comando para limpar terminal no Windows
-                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-            } else {
-                // Comando para limpar terminal no Linux e MacOS
-                new ProcessBuilder("clear").inheritIO().start().waitFor();
-            }
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace(); // Trata exceções de I/O ou interrupção
-        }
-    }
-
-    private Jogador atualizarJogador(Jogador jog, int indice_jog) {
-        jog.setMinhaVez(false);
-        indice_jog = (indice_jog + 1) % jogs.size();
-        jog = jogs.get(indice_jog);
-
-        return jog;
     }
 }

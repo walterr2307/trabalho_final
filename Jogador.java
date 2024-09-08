@@ -1,8 +1,8 @@
 public abstract class Jogador {
-    private int tipo_jog, num_moedas, num_jog, casa_atual;
-    private boolean minha_vez, vez_bloqueada, jogar_novamente;
-    private char sigla;
-    private String nome, cor, str_tipo_jogador;
+    protected int tipo_jog, num_moedas, num_jog, casa_atual;
+    protected boolean minha_vez, vez_bloqueada, jogar_novamente;
+    protected char sigla;
+    protected String nome, cor, str_tipo_jogador;
 
     public Jogador(String nome, String cor, int num_jog, int tipo_jog) {
         this.nome = nome;
@@ -48,13 +48,15 @@ public abstract class Jogador {
         return this.minha_vez;
     }
 
-    public void imprimirInfomacoes() {
+    public String imprimirInfomacoes() {
         char letra = ' ';
+        String formato;
 
         if (minha_vez)
             letra = '*';
 
-        System.out.printf("%c %s (%s, %s): %d moedas\n", letra, nome, str_tipo_jogador, cor, num_moedas);
+        formato = String.format("%c %s (%s, %s): %d moedas", letra, nome, str_tipo_jogador, cor, num_moedas);
+        return formato;
     }
 
     public String getNome() {
@@ -100,7 +102,7 @@ public abstract class Jogador {
         this.casa_atual = casa_atual;
     }
 
-    private String definirTipoJogador() {
+    protected String definirTipoJogador() {
         if (tipo_jog == 0)
             return "Normal";
         else if (tipo_jog == 1)

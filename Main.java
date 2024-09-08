@@ -1,19 +1,32 @@
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        int qtd_jogs;
-        Scanner scanner = new Scanner(System.in);
+        int qtd_jogs = 0, qtd_casas = 0;
         Jogo jogo = new Jogo();
-        ArrayList<String> nomes = new ArrayList<String>();
-        ArrayList<String> cores = new ArrayList<String>();
-        ArrayList<Integer> tipos = new ArrayList<Integer>();
+        Scanner scanner = new Scanner(System.in);
 
-        qtd_jogs = jogo.escolherQtdJogadores(scanner);
-        jogo.escolherNomeCor(nomes, cores, qtd_jogs, scanner);
-        jogo.escolherTipo(nomes, tipos, qtd_jogs, scanner);
-        jogo.gerarTabuleiro(nomes, cores, tipos, scanner);
+        while (true) {
+            try {
+                System.out.print("Digite a quantidade de casas: ");
+                qtd_casas = scanner.nextInt();
+                System.out.print("Digite a quantidade de jogadores: ");
+                qtd_jogs = scanner.nextInt();
+
+                if (qtd_casas < 3 || qtd_jogs < 2 || qtd_jogs > 6)
+                    throw new AcaoInvalidaException();
+
+                break;
+            } catch (AcaoInvalidaException e) {
+                if (qtd_casas < 3)
+                    e.qtdCasasInsuficientes();
+                else
+                    e.QtdJogsInvalida();
+            }
+        }
+
+        jogo.configTabuleiro(qtd_casas);
+        jogo.config(qtd_jogs);
 
         scanner.close();
     }

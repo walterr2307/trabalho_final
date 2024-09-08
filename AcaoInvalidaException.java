@@ -17,14 +17,30 @@ public class AcaoInvalidaException extends Exception {
     }
 
     public void excedeLimiteCasas() {
-        System.out.println("\nOs indices das casas variam de 1 a 40!");
+        System.out.println("\nNao exceda o limite das casas!");
     }
 
-    public void tipoCasaInvalido(){
-        System.out.println("\nEscolha um tipo de casa entre 1 e 7!");
+    public void tipoCasaInvalido() {
+        System.out.println("\nEssa tipo de casa nao pode ser selecionado!");
     }
 
-    public void casaJaSelecionada(){
+    public void casaJaSelecionada() {
         System.out.println("\nEssa casa ja foi selecionada. Escolha outra!");
+    }
+
+    public void todosAcessoriosComprados() {
+        System.out.println("\nVoce ja comprou todos os acessorios!");
+    }
+
+    public void moedasInsuficientes() {
+        System.out.println("\nVoce nao tem 5 moedas!");
+    }
+
+    public void qtdCasasInsuficientes() {
+        System.out.println("\nPonha, pelo menos, 3 casas!");
+    }
+
+    public void tiposIguais() {
+        System.out.println("\nTodos os tipos de jogadores nao podem serem iguais!");
     }
 }
