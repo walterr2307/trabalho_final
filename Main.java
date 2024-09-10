@@ -27,6 +27,8 @@ public class Main {
 
         jogo.configTabuleiro(qtd_casas);
         jogo.config(qtd_jogs);
+        jogo.printTabuleiro();
+        jogo.start();
 
         scanner.close();
     }

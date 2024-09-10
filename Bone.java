@@ -13,4 +13,11 @@ public class Bone extends Decorator {
     public String imprimirInformacoes() {
         return jog.imprimirInfomacoes() + " --> Bone";
     }
+
+    public void addMoedas(int novas_moedas) {
+        if (novas_moedas == 1)
+            jog.addMoedas(2);
+        else
+            jog.addMoedas(novas_moedas);
+    }
 }

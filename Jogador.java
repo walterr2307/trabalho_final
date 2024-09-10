@@ -1,5 +1,5 @@
 public abstract class Jogador {
-    protected int tipo_jog, num_moedas, num_jog, casa_atual;
+    protected int tipo_jog, num_moedas, num_jog, casa_atual, qtd_casas;
     protected boolean minha_vez, vez_bloqueada, jogar_novamente;
     protected char sigla;
     protected String nome, cor, str_tipo_jogador;
@@ -19,6 +19,10 @@ public abstract class Jogador {
     }
 
     public abstract int[] girarDados();
+
+    public void setQtdCasas(int qtd_casas) {
+        this.qtd_casas = qtd_casas;
+    }
 
     public void setJogarNovamente(boolean jogar_novamente) {
         this.jogar_novamente = jogar_novamente;
@@ -82,8 +86,8 @@ public abstract class Jogador {
     public void andarCasas(int qtd_passos) {
         this.casa_atual += qtd_passos;
 
-        if (this.casa_atual > 40)
-            this.casa_atual = 40;
+        if (this.casa_atual > qtd_casas - 1)
+            this.casa_atual = qtd_casas - 1;
     }
 
     public int getCasaAtual() {

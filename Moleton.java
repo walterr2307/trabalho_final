@@ -10,6 +10,13 @@ public class Moleton extends Decorator {
         return jog.girarDados();
     }
 
+    public void addMoedas(int novas_moedas) {
+        if (novas_moedas == 2)
+            jog.addMoedas(4);
+        else
+            jog.addMoedas(novas_moedas);
+    }
+
     public String imprimirInformacoes() {
         return jog.imprimirInfomacoes() + ", Moleton";
     }
