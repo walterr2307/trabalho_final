@@ -12,8 +12,8 @@ public class Jogo {
     public void printTabuleiro() {
         tabuleiro.definirPrimeiroJogador();
         tabuleiro.atribuirQtdCasasJogs();
-        tabuleiro.atualizarSiglas();
         tabuleiro.imprimirPrimeiraRodada();
+        tabuleiro.imprimirInfoJogadores();
     }
 
     public void start() {

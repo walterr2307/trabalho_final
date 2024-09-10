@@ -59,7 +59,8 @@ public abstract class Jogador {
         if (minha_vez)
             letra = '*';
 
-        formato = String.format("%c %s (%s, %s): %d moedas", letra, nome, str_tipo_jogador, cor, num_moedas);
+        formato = String.format("%c %s (%s, %s, %d): %d moedas", letra, nome, str_tipo_jogador, cor, casa_atual,
+                num_moedas);
         return formato;
     }
 

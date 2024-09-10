@@ -4,7 +4,7 @@ import java.util.Scanner;
 public class Tabuleiro {
     // A única instância da classe Tabuleiro (Singleton)
     private static Tabuleiro instancia;
-    private int[] dados;
+    private int[] dados = { 0, 0 };
     private Jogador jog;
     private Scanner scanner = new Scanner(System.in);
     private Factory factory = new Factory();
@@ -254,91 +254,50 @@ public class Tabuleiro {
 
     // Imprime o estado inicial do tabuleiro e dos jogadores
     public void imprimirPrimeiraRodada() {
-        jog.setMinhaVez(true);
-        System.out.println();
-
-        // Imprime o tabuleiro
-        for (int i = 0; i < casas.size(); i++) {
-            casas.get(i).imprimirCasa();
-
-            if ((i + 1) % 10 == 0)
-                System.out.println();
-        }
-
-        System.out.println();
-
-        // Imprime as informações dos jogadores
-        for (Jogador jogador : jogs)
-            System.out.println(jogador.imprimirInfomacoes());
-
-        // Solicita ao usuário para girar os dados
-        System.out.print("\nPressione ENTER para girar os dados: ");
-        scanner.nextLine();
-
-        // Gira os dados e atualiza a posição do jogador
-        dados = jog.girarDados();
-        casas.get(jog.getCasaAtual()).setSigla(' ', jog.getNumJogador());
-        jog.andarCasas(dados[0] + dados[1]);
-        casas.get(jog.getCasaAtual()).setSigla(jog.getSigla(), jog.getNumJogador());
-        casas.get(jog.getCasaAtual()).aplicarRegra(jog, jogs);
+        definirPrimeiroJogador();
+        atribuirQtdCasasJogs();
     }
 
     public void definirPrimeiroJogador() {
         jog = jogs.get(0);
     }
 
+    public void imprimirInfoJogadores() {
+        for (Jogador jog : jogs)
+            System.out.println(jog.imprimirInfomacoes());
+    }
+
     // Continua com as rodadas do jogo
     public void continuarRodadas() {
         while (true) {
             limparTerminal();
+            jog.setMinhaVez(true);
 
-            // Imprime o valor dos dados e a mensagem da casa atual
-            System.out.printf("Valores dos dados: [%d][%d]\n%s\n\n", dados[0], dados[1],
-                    casas.get(jog.getCasaAtual()).getMsg(jog));
-
-            // Atualiza o jogador se não tiver dados iguais ou se não tiver que jogar
-            // novamente
-            if (dados[0] != dados[1] && !jog.getJogarNovamente())
-                jog = atualizarJogador(jog, jogs);
-
-            // Se o jogador tiver que jogar novamente, reseta o flag
-            if (jog.getJogarNovamente())
-                jog.setJogarNovamente(false);
-
-            // Se o turno do jogador estiver bloqueado, imprime o estado do tabuleiro e
-            // jogadores
             if (jog.getVezBloqueada()) {
                 jog.setVezBloqueada(false);
-
-                jog.setMinhaVez(true);
-                System.out.println();
-
-                for (Jogador jogador : jogs)
-                    casas.get(0).setSigla(jogador.getSigla(), jogador.getNumJogador());
-
-                for (int i = 0; i < casas.size(); i++) {
-                    casas.get(i).imprimirCasa();
-
-                    if ((i + 1) % 10 == 0)
-                        System.out.println();
-                }
-
-                System.out.println();
+            } else {
+                System.out.printf("Valor dos Dados: [%d][%d]\nMsg: %s\n\n", dados[0], dados[1],
+                        casas.get(jog.getCasaAtual()).getMsg(jog));
 
                 for (Jogador jogador : jogs)
                     System.out.println(jogador.imprimirInfomacoes());
 
-                System.out.print("\nPressione ENTER para girar os dados: ");
-                scanner.nextLine();
-                continue;
+                dados = jog.girarDados();
+                jog.andarCasas(dados[0] + dados[1]);
+                casas.get(jog.getCasaAtual()).aplicarRegra(jog, jogs);
+
+                if (dados[0] != dados[1] && !jog.getJogarNovamente())
+                    jog = atualizarJogador(jog, jogs);
+
+                if (jog.getJogarNovamente())
+                    jog.setJogarNovamente(false); // Ajusta o estado corretamente
             }
 
-            // Imprime o estado inicial do tabuleiro e dos jogadores
-            imprimirPrimeiraRodada();
-
-            // Encerra o loop se o jogador chegou ao final do tabuleiro
             if (jog.getCasaAtual() == casas.size() - 1)
                 break;
+
+            System.out.print("\nAperte o ENTER para girar os dados: ");
+            scanner.nextLine();
         }
     }
 
