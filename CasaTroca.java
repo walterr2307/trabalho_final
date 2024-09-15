@@ -2,53 +2,63 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class CasaTroca extends Casa {
-    // Scanner para capturar entrada do usuário
-    Scanner scanner = new Scanner(System.in);
+    private Scanner scanner = new Scanner(System.in); // Scanner para capturar a entrada do usuário
 
-    // Método que aplica a regra de compra de acessórios para o jogador atual
-    public void aplicarRegra(Jogador jog, ArrayList<Jogador> jogs) {
-        int num_moedas, casa_atual;
-        boolean comprar;
+    // Método que aplica a regra da Casa Troca
+    // Permite ao jogador gastar 3 moedas para comprar um acessório, se possível
+    public void aplicarRegra(int indice, Jogador jog, ArrayList<Jogador> jogs) {
+        boolean gastar = false;
 
-        // Pergunta ao jogador se deseja gastar 5 moedas para comprar uma roupa
-        System.out.print("Deseja gastar 5 moedas para comprar uma roupa (true ou false): ");
-        comprar = scanner.nextBoolean();
+        // Loop para garantir que o jogador forneça uma entrada válida (true/false)
+        while (true) {
+            System.out.print("Quer gastar 3 moedas para comprar um acessório? (true/false): ");
+            String input = scanner.nextLine().toLowerCase(); // Lê a entrada do jogador e converte para minúsculas
 
-        // Se o jogador não quiser comprar, o método retorna sem fazer nada
-        if (!comprar)
+            if (input.equals("true") || input.equals("false")) {
+                gastar = Boolean.parseBoolean(input); // Converte a string para um valor booleano
+                break; // Sai do loop se a entrada for válida
+            } else {
+                System.out.println("Por favor, digite 'true' ou 'false'.");
+            }
+        }
+
+        // Se o jogador não quiser gastar moedas, sai do método sem fazer alterações
+        if (!gastar)
             return;
 
         try {
-            // Verifica se o jogador tem moedas suficientes ou se já possui todos os
-            // acessórios
-            if (jog.getNumMoedas() < 5 || jog instanceof OculosEscuros)
-                throw new AcaoInvalidaException(); // Lança exceção se a ação for inválida
+            // Verifica se o jogador já tem o acessório "Óculos Escuros" ou se não tem
+            // moedas suficientes
+            if (jog instanceof OculosEscuros || jog.getQtdMoedas() < 3)
+                throw new AcaoInvalidaException(); // Lança exceção se a compra for inválida
 
-            // Armazena o número de moedas e a posição atual da casa do jogador
-            num_moedas = jog.getNumMoedas();
-            casa_atual = jog.getCasaAtual();
+            jog.addMoedas(-3); // Subtrai 3 moedas do jogador
 
-            // Verifica o tipo de acessório que o jogador possui e aplica a próxima troca
+            // Troca o acessório do jogador com base no acessório que ele já possui
             if (jog instanceof Bone)
-                jog = new Moleton(jog); // Se o jogador já tem um boné, recebe um moletom
+                jog = new Moleton(jog); // Se o jogador tem Boné, ganha Moleton
             else if (jog instanceof Moleton)
-                jog = new OculosEscuros(jog); // Se o jogador já tem moletom, recebe óculos escuros
+                jog = new OculosEscuros(jog); // Se tem Moleton, ganha Óculos Escuros
             else
-                jog = new Bone(jog); // Se não tiver nenhum acessório, recebe um boné
+                jog = new Bone(jog); // Se não tem acessório, ganha Boné
 
-            // Atualiza os dados do jogador (número de moedas e posição na casa)
-            jog.atualizarDados(num_moedas, casa_atual);
+            // Atualiza a lista de jogadores com o novo estado do jogador
+            jogs.set(indice, jog);
         } catch (AcaoInvalidaException e) {
-            // Trata exceções relacionadas à ação inválida
-            if (jog.getNumMoedas() < 5)
-                e.moedasInsuficientes(); // Se o jogador não tem moedas suficientes, notifica
+            // Trata as exceções caso o jogador não tenha moedas suficientes ou já tenha
+            // todos os acessórios
+            if (jog.getQtdMoedas() < 3)
+                e.moedasInsuficientes(); // Exibe mensagem de moedas insuficientes
             else
-                e.todosAcessoriosComprados(); // Se já comprou todos os acessórios, notifica
+                e.todosAcessorios(); // Exibe mensagem se o jogador já possui todos os acessórios
+
+            System.out.print("Pressione ENTER para continuar: ");
+            scanner.nextLine();
         }
     }
 
-    // Retorna uma mensagem personalizada quando o jogador para na casa de troca
+    // Método que retorna a mensagem quando o jogador para na Casa Troca
     public String getMsg(Jogador jog) {
-        return "Parou na casa de troca!";
+        return "Voce parou na loja de acessorios!"; // Mensagem indicando que o jogador chegou à loja de acessórios
     }
 }

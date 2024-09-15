@@ -1,106 +1,86 @@
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
-// Classe CasaSurpresa que herda de Casa. Aplica regras baseadas em sorte para mudar o tipo de jogador.
 public class CasaSurpresa extends Casa {
-    Scanner scanner = new Scanner(System.in);
+    private Scanner scanner = new Scanner(System.in); // Scanner para ler a entrada do jogador
+    private Fabrica fabrica = new Fabrica(); // Fabrica usada para criar um novo jogador do tipo selecionado
 
-    // Método privado que converte o tipo de jogador (int) em uma string
-    // correspondente ("NORMAL", "SORTUDO" ou "AZARADO").
-    private String atribuirTipoJogador(int tipo_jog) {
-        String str_tipo = null;
+    // Método que aplica a regra da Casa Surpresa
+    // Permite ao jogador escolher entre duas cartas e, com base na escolha, troca o
+    // tipo do jogador
+    public void aplicarRegra(int indice, Jogador jog, ArrayList<Jogador> jogs) {
+        int carta_escolhida, sortear = (int) (Math.random() * 2); // Sorteio para decidir se inverte os tipos
+        int casa_atual, qtd_moedas, qtd_casas, num_jogadas; // Variáveis para armazenar o estado atual do jogador
+        String copia, tipo[] = new String[2]; // Array para armazenar os tipos de jogador possíveis
 
-        // Verifica o tipo do jogador e atribui a string correspondente.
-        switch (tipo_jog) {
-            case 0:
-                str_tipo = "NORMAL";
-                break;
-            case 1:
-                str_tipo = "SORTUDO";
-                break;
-            default:
-                str_tipo = "AZARADO";
+        // Define os dois tipos alternativos com base no tipo atual do jogador
+        if (jog.getTipo().equals("normal")) {
+            tipo[0] = "sortudo";
+            tipo[1] = "azarado";
+        } else if (jog.getTipo().equals("sortudo")) {
+            tipo[0] = "normal";
+            tipo[1] = "azarado";
+        } else {
+            tipo[0] = "normal";
+            tipo[1] = "sortudo";
         }
 
-        return str_tipo; // Retorna a string correspondente ao tipo de jogador.
-    }
-
-    // Aplica uma regra de mudança de tipo de jogador (NORMAL, SORTUDO ou AZARADO)
-    // com base em uma escolha feita pelo jogador.
-    public void aplicarRegra(Jogador jog, ArrayList<Jogador> jogs) {
-        // Variáveis locais para armazenar informações temporárias.
-        int j = 0, tipos_jog[] = new int[2], sorteio = (int) (Math.random() * 2), carta, indice = 0;
-        int num_moedas, casa_atual;
-        String str_tipos[] = new String[2], str_carta, nome, cor;
-
-        // Loop que define os dois tipos de jogadores possíveis, exceto o tipo atual do
-        // jogador.
-        for (int i = 0; i < 3; i++) {
-            if (i != jog.getTipoJogador()) {
-                tipos_jog[j] = i;
-                ++j; // Incrementa o índice do array tipos_jog.
-            } else {
-                indice = i; // Armazena o tipo atual do jogador.
-            }
+        // Sorteio para decidir se os tipos devem ser invertidos
+        if (sortear == 1) {
+            copia = tipo[0]; // Troca os valores de tipo[0] e tipo[1] se o sorteio for 1
+            tipo[0] = tipo[1];
+            tipo[1] = copia;
         }
 
-        // Sorteia qual dos dois tipos possíveis será apresentado primeiro.
-        if (sorteio == 1) {
-            sorteio = tipos_jog[0];
-            tipos_jog[0] = tipos_jog[1];
-            tipos_jog[1] = sorteio;
-        }
-
-        // Converte os tipos inteiros para suas representações em string.
-        str_tipos[0] = atribuirTipoJogador(tipos_jog[0]);
-        str_tipos[1] = atribuirTipoJogador(tipos_jog[1]);
-
-        // Loop que solicita ao jogador a escolha de uma carta, garantindo que a escolha
-        // seja válida.
+        // Loop para garantir que a entrada do jogador seja válida
         while (true) {
             try {
-                System.out.printf("\n1.%s  2.%s\n", str_tipos[0], str_tipos[1]);
-                System.out.print("Selecione um tipo de carta: ");
-                carta = scanner.nextInt() - 1; // Subtrai 1 para ajustar o índice ao array.
+                while (true) {
+                    try {
+                        System.out.print("\n\nEscolha uma carta(1 ou 2): ");
+                        carta_escolhida = scanner.nextInt(); // Lê a escolha da carta
+                        break; // Sai do loop se a entrada for válida
+                    } catch (InputMismatchException e) {
+                        // Trata a exceção se o jogador não digitar um número inteiro
+                        System.out.println("Por favor, digite um número inteiro válido.");
+                        scanner.next(); // Limpa a entrada inválida
+                    }
+                }
 
-                // Lança exceção se a escolha for inválida.
-                if (carta < 0 || carta > 1)
-                    throw new AcaoInvalidaException();
+                if (carta_escolhida < 1 || carta_escolhida > 2) // Verifica se a carta escolhida está fora do intervalo
+                                                                // permitido
+                    throw new AcaoInvalidaException(); // Lança exceção customizada se a escolha for inválida
 
-                str_carta = str_tipos[carta]; // Armazena o tipo de carta selecionado.
-
-                break; // Sai do loop quando a seleção for válida.
+                scanner.nextLine(); // Limpa o buffer de entrada
+                break;
             } catch (AcaoInvalidaException e) {
-                e.tipoNaoExistente(); // Trata exceções de ações inválidas.
+                e.cartaInvalida(); // Mostra uma mensagem de erro se a carta escolhida for inválida
             }
         }
 
-        // Armazena as informações do jogador antes de alterar o tipo.
-        nome = jog.getNome();
-        cor = jog.getCor();
-        num_moedas = jog.getNumMoedas();
+        // Salva o estado atual do jogador antes de mudar o tipo
+        qtd_moedas = jog.getQtdMoedas();
+        qtd_casas = jog.getQtdCasas();
         casa_atual = jog.getCasaAtual();
+        num_jogadas = jog.getNumJogadas();
 
-        // Verifica o tipo de carta selecionado e altera o tipo do jogador na lista de
-        // jogadores.
-        switch (str_carta) {
-            case "NORMAL":
-                jogs.set(indice, new JogadorNormal(nome, cor, indice, 0));
-                jogs.get(indice).atualizarDados(num_moedas, casa_atual);
-                break;
-            case "SORTUDO":
-                jogs.set(indice, new JogadorSortudo(nome, cor, indice, 1));
-                jogs.get(indice).atualizarDados(num_moedas, casa_atual);
-                break;
-            default:
-                jogs.set(indice, new JogadorAzarado(nome, cor, indice, 2));
-                jogs.get(indice).atualizarDados(num_moedas, casa_atual);
-        }
+        // Cria um novo jogador com o tipo selecionado pela carta escolhida
+        jog = fabrica.retornarJogador(tipo[carta_escolhida - 1], jog.getCor());
 
-        System.out.println(); // Imprime uma linha em branco ao final do método.
+        // Restaura o estado anterior do jogador (moedas, posição, etc.) após a troca de
+        // tipo
+        jog.setCasaAtual(casa_atual);
+        jog.setQtdCasas(qtd_casas);
+        jog.setQtdMoedas(qtd_moedas);
+        jog.setNumJogadas(num_jogadas);
+
+        // Atualiza a lista de jogadores com o novo tipo do jogador
+        jogs.set(indice, jog);
     }
 
+    // Método que retorna uma mensagem indicando que o jogador trocou de tipo
     public String getMsg(Jogador jog) {
-        return "Trocou de tipo!";
+        return "Trocou de tipo!"; // Mensagem informando que o tipo do jogador foi alterado
     }
 }

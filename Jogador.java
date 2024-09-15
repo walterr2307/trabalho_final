@@ -1,118 +1,155 @@
 public abstract class Jogador {
-    protected int tipo_jog, num_moedas, num_jog, casa_atual, qtd_casas;
-    protected boolean minha_vez, vez_bloqueada, jogar_novamente;
-    protected char sigla;
-    protected String nome, cor, str_tipo_jogador;
+    // Atributos protegidos que definem o estado do jogador
+    protected int qtd_moedas = 0, casa_atual = 0, num_jogadas = 0, qtd_casas;
+    protected boolean minha_vez = false, vez_bloqueada = false, jogar_novamente = false;
+    protected char seta_vez = ' '; // Indica visualmente se é a vez do jogador
+    protected String cor, tipo_jog; // Cor do jogador e tipo (podem ser usadas para personalização ou lógica)
 
-    public Jogador(String nome, String cor, int num_jog, int tipo_jog) {
-        this.nome = nome;
+    // Construtor da classe Jogador, inicializa cor e tipo de jogador
+    public Jogador(String cor, String tipo_jog) {
         this.cor = cor;
-        this.num_jog = num_jog;
         this.tipo_jog = tipo_jog;
-        this.sigla = cor.charAt(0);
-        this.num_moedas = 0;
-        this.casa_atual = 0;
-        this.minha_vez = false;
-        this.vez_bloqueada = false;
-        this.jogar_novamente = false;
-        this.str_tipo_jogador = definirTipoJogador();
     }
 
+    // Método abstrato que será implementado pelas subclasses para realizar a ação
+    // de girar dados
     public abstract int[] girarDados();
 
+    // Método para o jogador ganhar uma moeda
+    public void ganharUmaMoeda() {
+        ++qtd_moedas;
+    }
+
+    // Retorna o número de jogadas feitas pelo jogador
+    public int getNumJogadas() {
+        return num_jogadas;
+    }
+
+    // Define o número de jogadas feitas pelo jogador
+    public void setNumJogadas(int num_jogadas) {
+        this.num_jogadas = num_jogadas;
+    }
+
+    // Incrementa o número de jogadas feitas
+    public void addNumJogadas() {
+        ++num_jogadas;
+    }
+
+    // Retorna a cor do jogador
+    public String getCor() {
+        return cor;
+    }
+
+    // Retorna o tipo do jogador
+    public String getTipo() {
+        return tipo_jog;
+    }
+
+    // Define o número de casas no tabuleiro
     public void setQtdCasas(int qtd_casas) {
         this.qtd_casas = qtd_casas;
     }
 
-    public void setJogarNovamente(boolean jogar_novamente) {
-        this.jogar_novamente = jogar_novamente;
+    // Retorna o número total de casas no tabuleiro
+    public int getQtdCasas() {
+        return qtd_casas;
     }
 
-    public boolean getJogarNovamente() {
-        return this.jogar_novamente;
+    // Imprime as informações do jogador (cor, tipo, casa atual, moedas), formatando
+    // se for a vez dele
+    public String imprimirInformacoes() {
+        String formato;
+
+        // Se for a vez do jogador, seta_vez recebe '*', caso contrário ' '
+        if (minha_vez)
+            seta_vez = '*';
+        else
+            seta_vez = ' ';
+
+        // Retorna uma string formatada com os detalhes do jogador
+        formato = String.format("%c  Jogador %s (%s, casa %d): %d moedas", seta_vez, cor, tipo_jog, casa_atual,
+                qtd_moedas);
+
+        return formato;
     }
 
-    public void setVezBloqueada(boolean vez_bloqueada) {
-        this.vez_bloqueada = vez_bloqueada;
+    // Retorna a casa atual do jogador
+    public int getCasaAtual() {
+        return casa_atual;
     }
 
-    public boolean getVezBloqueada() {
-        return vez_bloqueada;
+    // Adiciona moedas ao jogador, garantindo que a quantidade mínima de moedas seja
+    // 0
+    public void addMoedas(int novas_moedas) {
+        qtd_moedas += novas_moedas;
+
+        // Garante que o número de moedas não fique negativo
+        if (qtd_moedas < 0)
+            qtd_moedas = 0;
     }
 
-    public int getNumMoedas() {
-        return this.num_moedas;
+    // Retorna a quantidade de moedas do jogador
+    public int getQtdMoedas() {
+        return qtd_moedas;
     }
 
+    // Retorna se é a vez do jogador
+    public boolean getMinhaVez() {
+        return minha_vez;
+    }
+
+    // Define se é a vez do jogador
     public void setMinhaVez(boolean minha_vez) {
         this.minha_vez = minha_vez;
     }
 
-    public boolean getMinhaVez() {
-        return this.minha_vez;
+    // Retorna se a vez do jogador está bloqueada
+    public boolean getVezBloqueada() {
+        return vez_bloqueada;
     }
 
-    public String imprimirInfomacoes() {
-        char letra = ' ';
-        String formato;
-
-        if (minha_vez)
-            letra = '*';
-
-        formato = String.format("%c %s (%s, %s, %d): %d moedas", letra, nome, str_tipo_jogador, cor, casa_atual,
-                num_moedas);
-        return formato;
+    // Define se a vez do jogador está bloqueada
+    public void setVezBloqueada(boolean vez_bloqueada) {
+        this.vez_bloqueada = vez_bloqueada;
     }
 
-    public String getNome() {
-        return this.nome;
+    // Retorna se o jogador pode jogar novamente
+    public boolean getJogarNovamente() {
+        return jogar_novamente;
     }
 
-    public String getCor() {
-        return this.cor;
+    // Define se o jogador pode jogar novamente
+    public void setJogarNovamente(boolean jogar_novamente) {
+        this.jogar_novamente = jogar_novamente;
     }
 
-    public int getTipoJogador() {
-        return this.tipo_jog;
-    }
+    // Define a casa atual do jogador
+    public void setCasaAtual(int casa_atual) {
+        this.casa_atual = casa_atual;
 
-    public char getSigla() {
-        return this.sigla;
-    }
-
-    public int getNumJogador() {
-        return this.num_jog;
-    }
-
-    public void andarCasas(int qtd_passos) {
-        this.casa_atual += qtd_passos;
-
+        if (this.casa_atual < 0)
+            this.casa_atual = 0;
         if (this.casa_atual > qtd_casas - 1)
             this.casa_atual = qtd_casas - 1;
     }
 
-    public int getCasaAtual() {
-        return this.casa_atual;
+    // Define a quantidade de moedas do jogador
+    public void setQtdMoedas(int qtd_moedas) {
+        this.qtd_moedas = qtd_moedas;
     }
 
-    public void addMoedas(int novas_moedas) {
-        this.num_moedas += novas_moedas;
+    // Método que faz o jogador andar um determinado número de casas
+    public void andarCasas(int passos) {
+        casa_atual += passos;
 
-        if (this.num_moedas < 0)
-            this.num_moedas = 0;
+        // Garante que o jogador não ultrapasse os limites do tabuleiro
+        if (casa_atual > qtd_casas - 1)
+            casa_atual = qtd_casas - 1;
+        if (casa_atual < 0)
+            casa_atual = 0;
     }
 
-    public void atualizarDados(int num_moedas, int casa_atual) {
-        this.num_moedas = num_moedas;
-        this.casa_atual = casa_atual;
-    }
+    public void atualizarInfos() {
 
-    protected String definirTipoJogador() {
-        if (tipo_jog == 0)
-            return "Normal";
-        else if (tipo_jog == 1)
-            return "Sortudo";
-        else
-            return "Azarado";
     }
 }

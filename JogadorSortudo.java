@@ -1,7 +1,7 @@
 public class JogadorSortudo extends Jogador {
 
-    public JogadorSortudo(String nome, String cor, int i, int tipo_jog) {
-        super(nome, cor, i, tipo_jog);
+    public JogadorSortudo(String cor, String tipo_jog) {
+        super(cor, tipo_jog);
     }
 
     public int[] girarDados() {

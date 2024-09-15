@@ -1,7 +1,7 @@
 public class JogadorNormal extends Jogador {
 
-    public JogadorNormal(String nome, String cor, int i, int tipo_jog) {
-        super(nome, cor, i, tipo_jog);
+    public JogadorNormal(String cor, String tipo_jog) {
+        super(cor, tipo_jog);
     }
 
     public int[] girarDados() {

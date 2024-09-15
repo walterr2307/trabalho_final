@@ -1,46 +1,38 @@
 public class AcaoInvalidaException extends Exception {
 
-    public void QtdJogsInvalida() {
-        System.out.println("\nColoque um valor entre 2 e 6!");
-    }
-
-    public void CorInexistente() {
-        System.out.println("\nColoque uma cor valida!");
-    }
-
-    public void tipoNaoExistente() {
-        System.out.println("\nColoque um tipo valido!");
-    }
-
-    public void posJaSelecionada() {
-        System.out.println("\nVoce ja escolheu essa posicao!");
-    }
-
-    public void excedeLimiteCasas() {
-        System.out.println("\nNao exceda o limite das casas!");
-    }
-
-    public void tipoCasaInvalido() {
-        System.out.println("\nEssa tipo de casa nao pode ser selecionado!");
-    }
-
-    public void casaJaSelecionada() {
-        System.out.println("\nEssa casa ja foi selecionada. Escolha outra!");
-    }
-
-    public void todosAcessoriosComprados() {
-        System.out.println("\nVoce ja comprou todos os acessorios!");
-    }
-
-    public void moedasInsuficientes() {
-        System.out.println("\nVoce nao tem 5 moedas!");
-    }
-
     public void qtdCasasInsuficientes() {
-        System.out.println("\nPonha, pelo menos, 3 casas!");
+        System.out.println("\nPonha, pelo menos, 10 casas!\n");
+    }
+
+    public void qtdJogsInvalida() {
+        System.out.println("\nPonha entre 2 e 6 jogadores!\n");
+    }
+
+    public void excedeuQtdCasas() {
+        System.out.println("\nO numero de casas excedeu o limite!\n");
+    }
+
+    public void tipoInvalido() {
+        System.out.println("\nPonha um tipo valido!\n");
+    }
+
+    public void corInvalida() {
+        System.out.println("\nNao eh possivel colocar essa cor!\n");
     }
 
     public void tiposIguais() {
-        System.out.println("\nTodos os tipos de jogadores nao podem serem iguais!");
+        System.out.println("\nOs tipos de todos os jogadores nao podem serem iguais!\n");
+    }
+
+    public void cartaInvalida() {
+        System.out.println("\nSeleciona um indice entre 1 e 2!\n");
+    }
+
+    public void moedasInsuficientes() {
+        System.out.println("\nVoce nao tem moedas suficientes!\n");
+    }
+
+    public void todosAcessorios() {
+        System.out.println("\nVoce ja comprou todos os acessorios!\n");
     }
 }

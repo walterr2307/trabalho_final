@@ -1,19 +1,18 @@
 public class Jogo {
-    private Tabuleiro tabuleiro = Tabuleiro.instanciar();
+    Tabuleiro tabuleiro = Tabuleiro.instanciar();
 
     public void configTabuleiro(int qtd_casas) {
-        tabuleiro.ajustarCasas(qtd_casas);
+        tabuleiro.configurarCasas(qtd_casas);
     }
 
     public void config(int qtd_jogs) {
-        tabuleiro.ajustarJogadores(qtd_jogs);
+        tabuleiro.configurarJogadores(qtd_jogs);
     }
 
-    public void printTabuleiro() {
-        tabuleiro.definirPrimeiroJogador();
-        tabuleiro.atribuirQtdCasasJogs();
-        tabuleiro.imprimirPrimeiraRodada();
-        tabuleiro.imprimirInfoJogadores();
+    public void printTabuleiro(int qtd_casas, boolean modo_debug) {
+        tabuleiro.setModoDebug(modo_debug);
+        tabuleiro.ajustarPrimeiroJogador(qtd_casas);
+        tabuleiro.comecarRodada();
     }
 
     public void start() {

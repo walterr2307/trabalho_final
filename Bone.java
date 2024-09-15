@@ -1,23 +1,22 @@
-public class Bone extends Decorator {
-    Jogador jog;
+public class Bone extends Decorador {
 
     public Bone(Jogador jog) {
         super(jog);
-        this.jog = jog;
     }
 
+    @Override
+    public void ganharUmaMoeda() {
+        jog.ganharUmaMoeda();
+        qtd_moedas = jog.getQtdMoedas() + 1;
+    }
+
+    @Override
     public int[] girarDados() {
-        return jog.girarDados();
+        return jog.girarDados(); // Mantém o comportamento de girar dados
     }
 
+    @Override
     public String imprimirInformacoes() {
-        return jog.imprimirInfomacoes() + " --> Bone";
-    }
-
-    public void addMoedas(int novas_moedas) {
-        if (novas_moedas == 1)
-            jog.addMoedas(2);
-        else
-            jog.addMoedas(novas_moedas);
+        return jog.imprimirInformacoes() + " --> bone"; // Adiciona o decorador "bone" na saída
     }
 }

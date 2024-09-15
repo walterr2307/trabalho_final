@@ -1,23 +1,22 @@
-public class OculosEscuros extends Decorator {
-    Jogador jog;
+public class OculosEscuros extends Decorador {
 
     public OculosEscuros(Jogador jog) {
         super(jog);
-        this.jog = jog;
     }
 
-    public int[] girarDados() {
-        return jog.girarDados();
+    @Override
+    public void ganharUmaMoeda() {
+        jog.ganharUmaMoeda();
+        qtd_moedas = jog.getQtdMoedas() + 3;
     }
 
+    @Override
     public String imprimirInformacoes() {
-        return jog.imprimirInfomacoes() + ", Oculos Escuros";
+        return jog.imprimirInformacoes() + ", oculos escuros"; // Adiciona o decorador "oculos escuros" na saída
     }
 
-    public void addMoedas(int novas_moedas) {
-        if (novas_moedas == 4)
-            jog.addMoedas(7);
-        else
-            jog.addMoedas(novas_moedas);
+    @Override
+    public int[] girarDados() {
+        return jog.girarDados(); // Mantém o comportamento de girar dados
     }
 }

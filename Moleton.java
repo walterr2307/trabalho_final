@@ -1,23 +1,22 @@
-public class Moleton extends Decorator {
-    Jogador jog;
+public class Moleton extends Decorador {
 
     public Moleton(Jogador jog) {
         super(jog);
-        this.jog = jog;
     }
 
-    public int[] girarDados() {
-        return jog.girarDados();
+    @Override
+    public void ganharUmaMoeda() {
+        jog.ganharUmaMoeda();
+        qtd_moedas = jog.getQtdMoedas() + 2;
     }
 
-    public void addMoedas(int novas_moedas) {
-        if (novas_moedas == 2)
-            jog.addMoedas(4);
-        else
-            jog.addMoedas(novas_moedas);
-    }
-
+    @Override
     public String imprimirInformacoes() {
-        return jog.imprimirInfomacoes() + ", Moleton";
+        return jog.imprimirInformacoes() + ", moleton"; // Adiciona o decorador "moleton" na saída
+    }
+
+    @Override
+    public int[] girarDados() {
+        return jog.girarDados(); // Mantém o comportamento de girar dados
     }
 }
