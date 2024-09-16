@@ -11,8 +11,7 @@ public class Tabuleiro {
     private Scanner scanner = new Scanner(System.in); // Scanner para entrada do usuário
     private ArrayList<Casa> casas = new ArrayList<Casa>(); // Lista de casas do tabuleiro
     private ArrayList<Jogador> jogs = new ArrayList<Jogador>(); // Lista de jogadores
-    private AuxiliarTabuleiro aux_tabuleiro = new AuxiliarTabuleiro(casas, jogs); // Objeto auxiliar para configurar o
-                                                                                  // tabuleiro e jogadores
+    private AuxiliarTabuleiro aux_tabuleiro = AuxiliarTabuleiro.instanciar(casas, jogs); 
 
     // Construtor privado para impedir a criação de novas instâncias
     private Tabuleiro() {

@@ -12,7 +12,7 @@ public class CasaSurpresa extends Casa {
     public void aplicarRegra(int indice, Jogador jog, ArrayList<Jogador> jogs) {
         int carta_escolhida, sortear = (int) (Math.random() * 2); // Sorteio para decidir se inverte os tipos
         int casa_atual, qtd_moedas, qtd_casas, num_jogadas; // Variáveis para armazenar o estado atual do jogador
-        String copia, tipo[] = new String[2]; // Array para armazenar os tipos de jogador possíveis
+        String acessorio = retornarAcessorio(jog), copia, tipo[] = new String[2];
 
         // Define os dois tipos alternativos com base no tipo atual do jogador
         if (jog.getTipo().equals("normal")) {
@@ -68,12 +68,15 @@ public class CasaSurpresa extends Casa {
         // Cria um novo jogador com o tipo selecionado pela carta escolhida
         jog = fabrica.retornarJogador(tipo[carta_escolhida - 1], jog.getCor());
 
+        if (!acessorio.equals("nenhum"))
+            jog = retornarJogador(jog);
+
         // Restaura o estado anterior do jogador (moedas, posição, etc.) após a troca de
         // tipo
-        jog.setCasaAtual(casa_atual);
         jog.setQtdCasas(qtd_casas);
         jog.setQtdMoedas(qtd_moedas);
         jog.setNumJogadas(num_jogadas);
+        jog.setCasaAtual(casa_atual);
 
         // Atualiza a lista de jogadores com o novo tipo do jogador
         jogs.set(indice, jog);
@@ -82,5 +85,25 @@ public class CasaSurpresa extends Casa {
     // Método que retorna uma mensagem indicando que o jogador trocou de tipo
     public String getMsg(Jogador jog) {
         return "Trocou de tipo!"; // Mensagem informando que o tipo do jogador foi alterado
+    }
+
+    private String retornarAcessorio(Jogador jog) {
+        if (jog instanceof Bone)
+            return "bone";
+        else if (jog instanceof Moleton)
+            return "moleton";
+        else if (jog instanceof OculosEscuros)
+            return "oculos";
+        else
+            return "nenhum";
+    }
+
+    private Jogador retornarJogador(Jogador jog) {
+        if (jog instanceof Bone)
+            return new Bone(jog);
+        else if (jog instanceof Moleton)
+            return new Moleton(new Bone(jog));
+        else
+            return new OculosEscuros(new Moleton(new Bone(jog)));
     }
 }

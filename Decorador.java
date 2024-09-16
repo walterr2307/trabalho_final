@@ -8,12 +8,14 @@ public abstract class Decorador extends Jogador {
         casa_atual = jog.getCasaAtual();
         qtd_moedas = jog.getQtdMoedas();
         num_jogadas = jog.getNumJogadas();
+        atualizarInfos();
     }
 
     public void atualizarInfos() {
         jog.setMinhaVez(minha_vez);
         jog.setCasaAtual(casa_atual);
         jog.setQtdMoedas(qtd_moedas);
+        jog.setTipoJogador(tipo_jog);
         jog.atualizarInfos();
     }
 

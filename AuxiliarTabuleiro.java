@@ -3,6 +3,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class AuxiliarTabuleiro {
+    private static AuxiliarTabuleiro instancia; // Instância única do Auxiliar Tabuleiro
     private int indice_cor; // Armazena o índice da cor selecionada
     private Fabrica fabrica = new Fabrica(); // Instância da fábrica que cria objetos de Casas e Jogadores
     private String tipos_jog[] = { "normal", "sortudo", "azarado" }; // Tipos de jogadores possíveis
@@ -13,9 +14,16 @@ public class AuxiliarTabuleiro {
     private Scanner scanner = new Scanner(System.in); // Scanner para entrada de dados
 
     // Construtor que recebe a lista de casas e jogadores
-    public AuxiliarTabuleiro(ArrayList<Casa> casas, ArrayList<Jogador> jogs) {
+    private AuxiliarTabuleiro(ArrayList<Casa> casas, ArrayList<Jogador> jogs) {
         this.casas = casas;
         this.jogs = jogs;
+    }
+
+    public static AuxiliarTabuleiro instanciar(ArrayList<Casa> casas, ArrayList<Jogador> jogs) {
+        if (instancia == null) {
+            instancia = new AuxiliarTabuleiro(casas, jogs); // Cria uma nova instância se não houver nenhuma
+        }
+        return instancia;
     }
 
     // Método para configurar as casas do tabuleiro

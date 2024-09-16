@@ -60,6 +60,8 @@ public abstract class Jogador {
     public String imprimirInformacoes() {
         String formato;
 
+        casa_atual = getCasaAtual();
+
         // Se for a vez do jogador, seta_vez recebe '*', caso contrário ' '
         if (minha_vez)
             seta_vez = '*';
@@ -147,6 +149,10 @@ public abstract class Jogador {
             casa_atual = qtd_casas - 1;
         if (casa_atual < 0)
             casa_atual = 0;
+    }
+
+    protected void setTipoJogador(String tipo_jog) {
+        this.tipo_jog = tipo_jog;
     }
 
     public void atualizarInfos() {
